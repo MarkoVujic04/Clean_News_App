@@ -54,18 +54,20 @@ class _NewsApiService implements NewsApiService {
           _dio.options.baseUrl,
           baseUrl,
         )));
-    final _result = await _dio.fetch<List<dynamic>>(_options);
-    late List<ArticleModel> _value;
-    try {
-      _value = _result.data!
-          .map((dynamic i) => ArticleModel.fromJson(i as Map<String, dynamic>))
-          .toList();
-    } on Object catch (e, s) {
-      errorLogger?.logError(e, s, _options);
-      rethrow;
-    }
-    final httpResponse = HttpResponse(_value, _result);
-    return httpResponse;
+    final _result = await _dio.fetch<Map<String, dynamic>>(_options);
+late List<ArticleModel> _value; // Keep this as the main declaration
+try {
+  _value = (_result.data!["articles"] as List)
+    .map((i) => ArticleModel.fromJson(i as Map<String, dynamic>))
+    .toList();
+
+} on Object catch (e, s) {
+  errorLogger?.logError(e, s, _options);
+  rethrow;
+}
+final httpResponse = HttpResponse(_value, _result);
+return httpResponse;
+
   }
 
   RequestOptions _setStreamType<T>(RequestOptions requestOptions) {
